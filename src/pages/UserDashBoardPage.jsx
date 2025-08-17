@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import BookCard from "../components/BookCard";
 import BookShareForm from "../components/BookShareForm";
+import Notification from "../components/Notification";
 import useAxios from "../hooks/useAxios";
 
 const UserDashBoardPage = () => {
@@ -8,29 +9,59 @@ const UserDashBoardPage = () => {
   const [nearbyBooks, setNearbyBooks] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState({
+    isVisible: false,
+    message: '',
+    type: 'success'
+  });
   const api = useAxios();
   
   const handleBookShared = () => {
     setShowShareForm(false);
+    setNotification({
+      isVisible: true,
+      message: 'Book shared successfully! 📚',
+      type: 'success'
+    });
+  };
+
+  const hideNotification = () => {
+    setNotification(prev => ({
+      ...prev,
+      isVisible: false
+    }));
   };
   
-  useEffect(() => {
-    const fetchNearbyBooks = async () => {
-      try {
-        const response = await api.get(`${import.meta.env.VITE_SERVER_BASE_URL}/books/nearby`);
-        if(response.status === 200) {
-          setNearbyBooks(response.data.books);
-        }
-      } catch (error) {
-        setError(error.response?.data?.message || 'Failed to fetch nearby books');
+  const fetchNearbyBooks = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(`${import.meta.env.VITE_SERVER_BASE_URL}/books/nearby`);
+      if(response.status === 200) {
+        setNearbyBooks(response.data.books);
       }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Failed to fetch nearby books');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchNearbyBooks();
   }, []);
   
 
   return (
-    <div className="px-4 py-6">
+    <>
+      {/* Notification */}
+      <Notification
+        message={notification.message}
+        type={notification.type}
+        isVisible={notification.isVisible}
+        onClose={hideNotification}
+      />
+      
+      <div className="px-4 py-6">
     {/* Header Section */}
     <div className="mb-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-2">Book Sharing Dashboard</h1>
@@ -132,6 +163,7 @@ const UserDashBoardPage = () => {
       )}
     </div>
   </div>
+    </>
   )
 }
 
