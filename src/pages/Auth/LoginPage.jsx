@@ -1,15 +1,17 @@
 import axios from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { Field } from "../../components/Field";
 import useAuth from "../../hooks/useAuth";
 
 export const LoginPage = () => {
-
+  const [loading, setLoading] = useState(false);
   const {register, handleSubmit, formState: {errors}, setError} = useForm();
   const navigate = useNavigate();
   const {setAuth} = useAuth();
   const submitForm = async (data) => {
+    setLoading(true);
     try {
       const res = await axios.post(`${import.meta.env.VITE_SERVER_BASE_URL}/login`, data)
       if(res.status === 200) {
@@ -33,6 +35,8 @@ export const LoginPage = () => {
       if(error.response.status === 500) {
         setError("email", {message: "Invalid email or password"});
       }
+    } finally {
+      setLoading(false);
     }
     
   }
@@ -88,7 +92,7 @@ export const LoginPage = () => {
             type="submit"
             className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 

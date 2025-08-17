@@ -17,6 +17,7 @@ export const RegisterPage = () => {
   const [gettingLocation, setGettingLocation] = useState(false);
 
   const submitForm = async (data) => {
+    setLoading(true);
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_SERVER_BASE_URL}/register`,
@@ -30,6 +31,8 @@ export const RegisterPage = () => {
       if (error.response.status === 500) {
         setError("email", { message: "Email already exists" });
       }
+    } finally {
+      setLoading(false);
     }
   };
 
