@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
 import BookCard from '../components/BookCard';
+import useAxios from '../hooks/useAxios';
 
 const AdminDashboard = () => {
+  const axios = useAxios();
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [books, setBooks] = useState([]);
@@ -14,7 +15,9 @@ const AdminDashboard = () => {
       setLoading(true);
       setError('');
       const response = await axios.get('/admin/users');
-      setUsers(response.data.users || []);
+      if (response.status === 200) {
+        setUsers(response.data.result || []);
+      }
     } catch (err) {
       setError('Failed to fetch users');
       console.error(err);
@@ -28,7 +31,10 @@ const AdminDashboard = () => {
       setLoading(true);
       setError('');
       const response = await axios.get('/admin/books');
-      setBooks(response.data.books || []);
+      console.log(response);
+      if (response.status === 200) {
+        setBooks(response.data.books || []);
+      }
     } catch (err) {
       setError('Failed to fetch books');
       console.error(err);
@@ -38,11 +44,8 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    if (activeTab === 'users') {
-      fetchUsers();
-    } else {
-      fetchBooks();
-    }
+    fetchUsers();
+    fetchBooks();
   }, [activeTab]);
 
   const handleDeleteBook = async (bookId) => {
@@ -153,9 +156,6 @@ const AdminDashboard = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Joined
-                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -166,19 +166,16 @@ const AdminDashboard = () => {
                       </td>
                     </tr>
                   ) : (
-                    users.map((user) => (
+                    users.map((user, index) => (
                       <tr key={user.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {user.id}
+                          {index + 1}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {user.name}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {user.email}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
                         </td>
                       </tr>
                     ))

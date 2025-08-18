@@ -77,7 +77,7 @@ export const LoginPage = () => {
               placeholder="john@example.com"
             />
           </Field>
-          <Field error={errors.password?.message} label="Password" htmlFor="password" labelClassName="block text-sm font-medium text-gray-700 mb-2" error={errors.password?.message}>
+          <Field error={errors.password?.message} label="Password" htmlFor="password" labelClassName="block text-sm font-medium text-gray-700 mb-2">
             <input
               type="password"
               id="password"
