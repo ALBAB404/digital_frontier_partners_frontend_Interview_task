@@ -31,7 +31,6 @@ const AdminDashboard = () => {
       setLoading(true);
       setError('');
       const response = await axios.get('/admin/books');
-      console.log(response);
       if (response.status === 200) {
         setBooks(response.data.books || []);
       }
